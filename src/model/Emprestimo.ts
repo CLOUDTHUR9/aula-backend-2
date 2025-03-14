@@ -13,6 +13,7 @@ export class Emprestimo{
     private dataEmprestimo: Date; // Data do empréstimo
     private dataDevolucao: Date; // Data da devolução do livro
     private statusEmprestimo: string; // Status do empréstimo
+    private statusEmprestimoRegistro: boolean = true;
 
      /**
      * Construtor da classe Emprestimos
@@ -136,6 +137,25 @@ export class Emprestimo{
         this.statusEmprestimo = _statusEmprestimo;
     }
 
+        /**
+     * Retorna o status do empréstimo
+     * @returns statusEmprestimo: status do empréstimo
+     */
+        public getStatusEmprestimoRegistro(): boolean {
+            return this.statusEmprestimoRegistro;
+        }
+    
+        /**
+         * Atribui o parâmetro ao atributo statusEmprestimo
+         * 
+         * @param _statusEmprestimo : status do empréstimo
+         */
+        public setStatusEmprestimoRegistro(_statusEmprestimoRegistro: boolean) {
+            this.statusEmprestimoRegistro = _statusEmprestimoRegistro;
+        }
+
+
+
     // MÉTODO PARA ACESSAR O BANCO DE DADOS
     // CRUD Create - READ - Update - Delete
 
@@ -255,6 +275,43 @@ export class Emprestimo{
             throw new Error('Erro ao cadastrar o empréstimo.');
         }
     }    
+
+
+        /**
+     * Remove um emprestimo do banco de dados
+     * @param idEmprestimo ID do emprestimo a ser removido
+     * @returns Boolean indicando se a remoção foi bem-sucedida
+    */
+        static async removerEmprestimo(id_emprestimo: number): Promise<Boolean> {
+            // variável de controle da execução da query
+            let queryResult = false;
+    
+            try {
+    
+                 // Construção da query SQL para deletar o Livro.
+                const queryDeleteEmprestimo = `UPDATE emprestimo 
+                                            SET status_emprestimo_registro = FALSE
+                                            WHERE id_emprestimo=${id_emprestimo};`;
+    
+                // Executa a query de exclusão e verifica se a operação foi bem-sucedida.
+                await database.query(queryDeleteEmprestimo)
+                    .then((result) => {
+                        if (result.rowCount != 0) {
+                            queryResult = true; // Se a operação foi bem-sucedida, define queryResult como true.
+                        }
+                    });
+    
+                // retorna o valor da variável de controle
+                return queryResult;
+    
+            // captura qualquer erro que possa acontecer
+            } catch (error) {
+                // Exibe detalhes do erro no console
+                console.log(`Erro na consulta: ${error}`);
+                // retorna o valor fa variável de controle
+                return queryResult;
+            }
+        }
 
      /**
      * Atualiza os dados de um empréstimo existente no banco de dados

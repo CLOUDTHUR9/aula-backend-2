@@ -64,6 +64,29 @@ class EmprestimoController extends Emprestimo{
         }
     }
 
+        /**
+         * Remove um Emprestimo.
+         * @param req Objeto de requisição HTTP com o ID do Emprestimo a ser removido.
+         * @param res Objeto de resposta HTTP.
+         * @returns Mensagem de sucesso ou erro em formato JSON.
+         */
+        static async remover(req: Request, res: Response): Promise<Response> {
+            try {
+                const idEmprestimo = parseInt(req.query.idEmprestimo as string);
+                const result = await Emprestimo.removerEmprestimo(idEmprestimo);
+                
+                if (result) {
+                    return res.status(200).json('Emprestimo removido com sucesso');
+                } else {
+                    return res.status(401).json('Erro ao deletar Emprestimo');
+                }
+            } catch (error) {
+                console.log("Erro ao remover o Emprestimo");
+                console.log(error);
+                return res.status(500).send("error");
+            }
+        }
+
     /**
      * Atualiza um empréstimo existente.
      * Recebe os dados do empréstimo a partir da requisição e passa para o serviço.

@@ -17,6 +17,7 @@ export class Livro {
     private quantDisponivel: number; // Quantidade disponível daquele exemplar
     private valorAquisicao: number; // Valor da arquisição do livro
     private statusLivroEmprestado: string; // Status do livro emprestado
+    private statusLivro: boolean = true;
 
     /**
     * Construtor da classe Livro
@@ -30,6 +31,7 @@ export class Livro {
     * @param quantDisponivel Quantidade disponível de exemplares do Livro
     * @param valorAquisicao Valor de aquisição do Livro
     * @param statusLivroEmprestado Status de empréstimo do Livro
+    * 
     */
     public constructor(_titulo: string, _autor: string, _editora: string, _anoPublicacao: string,
         _isbn: string, _quantTotal: number, _quantDisponivel: number, _valorAquisicao: number, _statusLivroEmprestimo: string) {
@@ -216,6 +218,23 @@ export class Livro {
         this.statusLivroEmprestado = _statusLivroEmprestado;
     }
 
+        /**
+    * Retorna o status do livro
+    * @returns status do livro : statusLivro
+    */
+        public getStatusLivro(): boolean {
+            return this.statusLivro;
+        }
+    
+        /**
+         * Atribui o parâmetro ao atributo status livro emprestado
+         * 
+         * @param _statusLivro : statusLivroEmprestado
+         */
+        public setStatusLivro(_statusLivro: boolean) {
+            this.statusLivro = _statusLivro;
+        }
+
     // MÉTODO PARA ACESSAR O BANCO DE DADOS
     // CRUD Create - READ - Update - Delete
 
@@ -252,9 +271,11 @@ export class Livro {
                 );
                 // adicionando o ID ao objeto
                 novoLivro.setIdLivro(livro.id_livro);
+                novoLivro.setStatusLivro(livro.status_livro)
 
                 // adicionando um livro na lista
                 listaDeLivros.push(novoLivro);
+                
             });
 
             // retornado a lista de livros para quem chamou a função
@@ -328,12 +349,16 @@ export class Livro {
 
         try {
             // Cria a consulta para rmeover empréstimo do banco de dados
-            const queryDeleteEmprestimoLivro = `DELETE FROM emprestimo WHERE id_livro=${id_livro}`;
+            const queryDeleteEmprestimoLivro = `UPDATE emprestimo
+                                                    SET status_emprestimo_registro = FALSE
+                                                    WHERE id_livro=${id_livro};`;
             // executa a query para remover empréstimo
             await database.query(queryDeleteEmprestimoLivro);
 
             // Construção da query SQL para deletar o Livro.
-            const queryDeleteLivro = `DELETE FROM Livro WHERE id_livro=${id_livro};`;
+            const queryDeleteLivro = `UPDATE Livro 
+                                        SET status_livro = FALSE
+                                        WHERE id_livro=${id_livro};`;
 
             // Executa a query de exclusão e verifica se a operação foi bem-sucedida.
             await database.query(queryDeleteLivro)
